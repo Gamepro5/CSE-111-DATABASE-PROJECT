@@ -1,5 +1,5 @@
-const SQL = await initSqlJs({ locateFile: filename => `/dist/${filename}` })
-const buffer = await fetch('/tpch.sqlite').then(r => r.arrayBuffer())
+const SQL = await initSqlJs({ locateFile: filename => `./dist/${filename}` })
+const buffer = await fetch('./tpch.sqlite').then(r => r.arrayBuffer())
 const db = new SQL.Database(new Uint8Array(buffer))
 
 
@@ -25,8 +25,21 @@ function create_table(arr) {
 
 }
 
-console.log(execute_sql("select * from customer"))
+var inputBox = document.getElementById("input");
+var submitButton = document.getElementById("submit");
 
-create_table(execute_sql("select * from customer"))
-
-create_table(execute_sql("select sum(c_acctbal) from customer"))
+submitButton.onclick = ()=>{
+    try {
+        create_table(execute_sql(inputBox.value))
+    } catch (error) {
+        showAlert(`<h2>Your SQLite query encountered a fatal error:</h2>
+        
+        <p style="font-size:20px;">`+ error.message +`</p>
+        
+        <div><gp5-accordion>Show Stack</gp5-accordion>
+		<div class="panel">
+        
+        ` + error.stack + `</div></div>`)
+        console.error(error)
+    }
+};

@@ -2,14 +2,44 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<link href="https://gamepro5.com/const.css" rel="stylesheet">
+		<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+		<meta property="og:site_name" content="gamepro5.com"/>
+		<meta name="description" content="A front-end SQLite executor for a database class."/>
+		<meta name="theme-color" content="#ff0000">
+		<meta property="og:image" content="https://gamepro5.com/images/gamepro5_trans_1080p.png"/>
+		<title>Database Project</title>
+		<script src="/localStorageSystem.js"></script><script src="/js/analytics.js"></script>
 	</head>
 
-<table id="resultTable"></table>
+<body class="js-error"><div id="nav-icon3"><span></span><span></span><span></span><span></span></div>
+<div class="main">
+	<div class="sidebar"><div class="js_error"><b>ERROR:</b> The quick links require JavaScript to load and function.</div></div>
+		<div class="wrapper">
+			<div class="header"><div class="js_error"><b>ERROR:</b> The navigation buttons and header require JavaScript to load and function.</div></div><div class="site_title"></div>
+				<div class="content">
+                    
+                    <h2>Front-end Web Database Interface</h2>
 
-<script src='/dist/sql-wasm.js'></script>
+                    Enter your SQLite Query in the box below:<br>
+                    <textarea id="input" style="width: 100%;height: 100px;">select * from customer</textarea>
+                    <p><a id="submit" class="button"><span>execute</span></a></p>
+					<table id="resultTable"></table>
+		</div>
+	</div>
+</div>
 
-<script src="/sqlite.js" type="module">
+<script src="https://gamepro5.com/const.js">
 </script>
 
+<script src="https://gamepro5.com/js/accordion.js">
+</script>
+
+<script src='./dist/sql-wasm.js'></script>
+
+<script src="./sqlite.js" type="module">
+</script>
+
+<noscript><div class="javascript-disabled-error"><div><h1>Warning.</h1> <p>This website requires JavaScript in order to function. Either your browser is too old to support JavaScript, or you've manually disabled it for some ungodly reason. If you've just re-enabled JavaScript, please reload this page.</p></div></div></noscript>
 </body>
 </html>
