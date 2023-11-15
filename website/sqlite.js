@@ -1,5 +1,5 @@
 const SQL = await initSqlJs({ locateFile: filename => `./dist/${filename}` })
-const buffer = await fetch('./tpch.sqlite').then(r => r.arrayBuffer())
+const buffer = await fetch('./musicCollection.db').then(r => r.arrayBuffer())
 const db = new SQL.Database(new Uint8Array(buffer))
 
 
