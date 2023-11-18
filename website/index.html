@@ -21,9 +21,29 @@
                     
                     <h2>Front-end Web Database Interface</h2>
 
+					<p>TODO:</p>
+					<ul>
+						<li>Create playlists</li>
+					</ul>
+					
+					
+						
+					<input type="text" id="email_input" value="user123@gmail.com" placeholder="Email"> <input type="text" id="password_input" value="guess" placeholder="Password"> <a id="loginButton" class="button"><span>login</span></a>
+
+					<p><a id="fetchPlaylists" class="button"><span>fetch playlists</span></a><a id="openLibrary" class="button"><span>open library</span></a></p>
+
+
+					<div><gp5-accordion>Advanced</gp5-accordion>
+					<div class="panel">
+					<input type="file" id="custom database upload" style="display:none;" accept=".db, .sqlite">
+					<p><a onclick="document.getElementById('custom database upload').click()" class="button"><span>load custom database</span></a></p>
                     Enter your SQLite Query in the box below:<br>
                     <textarea id="input" style="width: 100%;height: 100px;">select * from artist</textarea>
                     <p><a id="submit" class="button"><span>execute</span></a></p>
+					</div></div>
+
+
+
 					<table id="resultTable"></table>
 		</div>
 	</div>
