@@ -1,0 +1,22 @@
+createAccount(email, password)
+
+changeEmail(userKey, email)
+
+changePassword(userKey, password)
+
+createLibrary(userKey, libraryName)
+
+deleteLibrary(userKey, libraryKey)
+
+createPlaylist(userKey, libraryKey, playlistName)
+
+deletePlaylist(userKey, libraryKey, playlistKey)
+
+addSong(userKey, playlistKey, songID)
+
+removeSong(userKey, playlistKey, songID)
+
+shufflePlaylist(userKey, playlistID)
+
+
+
