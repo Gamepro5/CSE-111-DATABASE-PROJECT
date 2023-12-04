@@ -19,18 +19,55 @@
 			<div class="header"><div class="js_error"><b>ERROR:</b> The navigation buttons and header require JavaScript to load and function.</div></div><div class="site_title"></div>
 				<div class="content">
                     
-                    <h2>Front-end Web Database Interface</h2>
+                    <h1>Front-end Web Database Interface</h1>
+					
+					<h2>Account Settings</h2>
 
-					<p>TODO:</p>
-					<ul>
-						<li>Create playlists</li>
-					</ul>
-					
-					
+					<h3>Create Account</h3>
+
+					<input type="text" id="create_account_username_input" value="" placeholder="Username"> <input type="text" id="create_account_email_input" value="" placeholder="Email"> <input type="text" id="create_account_password_input" value="" placeholder="Password"> <a id="createAccountButton" class="button"><span>create</span></a>
+
+					<h3>Login</h3>
 						
 					<input type="text" id="email_input" value="user123@gmail.com" placeholder="Email"> <input type="text" id="password_input" value="guess" placeholder="Password"> <a id="loginButton" class="button"><span>login</span></a>
 
+					<h3>Options</h3>
+					<input type="text" id="changeEmail_input" value="" placeholder="New Email"> <a id="changeEmail" class="button"><span>change email</span></a><br>
+					
+					<input type="text" id="changePassword_input" value="" placeholder="New Password"> <a id="changePassword" class="button"><span>change password</span></a><br>
+
+					<input type="text" id="changeUsername_input" value="" placeholder="New Username"> <a id="changeUsername" class="button"><span>change username</span></a>
+
+					<h2>Library Settings</h2>
+					<h3>Create/Remove Library</h3>
+
+					<p><input type="text" id="libraryID" value="" placeholder="Library ID"><a id="deleteLibrary" class="button"><span>delete</span></a></p>	
+					<p><input type="text" id="libraryName_input" value="" placeholder="Library Name"><a id="createLibrary" class="button"><span>new</span></a></p>
+					
+					<h3>Add/Remove Songs from library</h3>
+					<p><input type="text" id="addSongLibraryID" value="" placeholder="Library ID"><input type="text" id="addSongToLib_SongID" value="" placeholder="Song ID"><br><a id="newSongToLib" class="button"><span>new</span></a><a id="removeSongFromLibrary" class="button"><span>delete</span></a></p>
+
+					<h3>Create/Remove Playlist</h3>
+					<p>From: <input type="text" id="playlsitLibraryID" value="" placeholder="Library ID"></p>
+					<p><input type="text" id="playlistID" value="" placeholder="Playlist ID"><a id="deletePlaylist" class="button"><span>delete</span></a></p>	
+					<p><input type="text" id="playlistName" value="" placeholder="Playlist Name"><a id="createPlaylist" class="button"><span>new</span></a></p>
+					
+					
+					<h3>Add/Remove Songs from playlist</h3>
+					<p><input type="text" id="addSongPlaylistID" value="" placeholder="Playlist ID"><input type="text" id="addSongToPlaylist_SongID" value="" placeholder="Song ID"><br><a id="newSongToPlaylist" class="button"><span>new</span></a><a id="removeSongFromPlaylist" class="button"><span>delete</span></a></p>
+
+					<h2>Browser</h2>
+
+
 					<p><a id="fetchPlaylists" class="button"><span>fetch playlists</span></a><a id="openLibrary" class="button"><span>open library</span></a></p>
+
+					<p><input type="text" id="getSongID" value="" placeholder="Song ID"><a id="getSong" class="button"><span>Fetch Song By ID</span></a></p>
+
+					<p><input type="text" id="searchSongName" value="" placeholder="Song Name"><a id="searchSong" class="button"><span>Search Song</span></a></p>
+
+					<p><input type="text" id="searchSongByArtistName_name" value="" placeholder="Artist Name"><a id="searchSongByArtistName" class="button"><span>find songs by artist</span></a></p>
+
+					
 
 
 					<div><gp5-accordion>Advanced</gp5-accordion>
