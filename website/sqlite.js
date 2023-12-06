@@ -1,5 +1,3 @@
-
-
 const SQL = await initSqlJs({ locateFile: filename => `./dist/${filename}` })
 const buffer = await fetch('./musicCollection.db').then(r => r.arrayBuffer())
 var db = new SQL.Database(new Uint8Array(buffer))
@@ -88,7 +86,7 @@ document.getElementById('fetchPlaylists').onclick = ()=>{
         try {
         
             output = execute_sql(`
-        select p_name as Playlist_Name, p_songID as SongID from user join library on l_userkey = u_userkey join playlist on l_playlistkey = p_playlistkey
+        select p_playlistkey as Playlist_Key, p_name as Playlist_Name, p_songID as SongID from user join library on l_userkey = u_userkey join playlist on l_playlistkey = p_playlistkey
         where u_userkey = @userkey`, {
             '@userkey' : userkey
         });
@@ -445,13 +443,16 @@ document.getElementById('newSongToLib').onclick = ()=>{
             showAlert("Song is already in this library.")
             return
         }
+        
+        
+
         output = execute_sql(`
         INSERT INTO library(l_userkey,l_librarykey,l_name, l_playlistkey, l_song_id)
-        VALUES ((@userkey),(@libKey),  (select l_name from library where l_librarykey = (@libkey) limit 1) ,NULL,(@songKey));`, { //REFUSES TO CORRECTLY DISPLAY l_name !!!!! AGHHHSHSHSHFABHFBDSJNDNSD
+        VALUES ((@userkey),(@libKey),  (select l_name from library where l_librarykey = `+document.getElementById("addSongLibraryID").value+` limit 1) ,NULL,(@songKey));`, {
         '@libKey' : document.getElementById("addSongLibraryID").value,
         '@userkey' : userkey,
-        '@songKey' : document.getElementById("addSongToLib_SongID").value
-    });
+        '@songKey' : document.getElementById("addSongToLib_SongID").value})
+        
 
     } catch (error) {
         console.log(error);
@@ -467,7 +468,94 @@ document.getElementById('newSongToLib').onclick = ()=>{
 };
 
 
-document.getElementById('removeSongFromLibrary').onclick = ()=>{ // not implemented
+document.getElementById('removeSongFromLibrary').onclick = ()=>{
+    if (userkey == undefined) {
+        showAlert("You must login first.")
+        return
+    }
+    
+    var output;
+    try {
+        output = execute_sql(`select * from library where l_librarykey = (@libKey) and l_userkey = (@userkey)`, {
+            '@libKey' : document.getElementById("addSongLibraryID").value,
+            '@userkey' : userkey
+        });
+        console.log(output)
+        if (output == undefined) {
+            showAlert("Invalid Library Key.")
+            return
+        }
+        output = execute_sql(`select * from library join user on l_userkey = u_userkey where l_song_id = @songKey`, {
+            '@libKey' : document.getElementById("addSongLibraryID").value,
+            '@userkey' : userkey,
+            '@songKey' : document.getElementById("addSongToLib_SongID").value
+        });
+        if (output == undefined) {
+            showAlert("Song is not in this library.")
+            return
+        }
+        
+        
+        // needed to stop using the parameter system because there is a security feature built into the library that prevents parameters from being used in delete and limit statements.
+        output = execute_sql(`
+        DELETE FROM library
+        WHERE l_libraryKey = `+document.getElementById("addSongLibraryID").value+` 
+        AND l_userKey = `+ userkey +`
+        AND l_song_id = `+document.getElementById("addSongToLib_SongID").value+`;
+        `)
+
+        
+
+    } catch (error) {
+        console.log(error);
+    }
+    if (output != undefined) {
+        create_table(output)
+    } else {
+        showAlert("Song Removed!")
+    }
+
+
+
+};
+
+
+
+document.getElementById('createPlaylist').onclick = ()=>{
+    if (userkey == undefined) {
+        showAlert("You must login first.")
+        return
+    }
+    
+    var output;
+    try {
+        
+        let playlistCount = execute_sql(`select max(l_playlistkey) from library`).values[0]+1
+        output = execute_sql(`
+
+        INSERT INTO library(l_userkey,l_librarykey,l_name, l_playlistkey, l_song_id)
+        VALUES (`+userkey+`,`+document.getElementById("playlsitLibraryID").value+`,(select l_name from library where l_librarykey = `+document.getElementById("playlsitLibraryID").value+` limit 1),`+playlistCount+`,NULL); 
+
+        INSERT INTO playlist(p_playlistkey,p_name, p_songID)
+        VALUES (`+playlistCount+`,`+document.getElementById("playlistName").value+`,NULL),
+        `)
+        
+
+    } catch (error) {
+        console.log(error);
+    }
+    if (output != undefined) {
+        create_table(output)
+    } else {
+        showAlert("Song Added!")
+    }
+
+
+
+};
+
+
+document.getElementById('deletePlaylist').onclick = ()=>{
     if (userkey == undefined) {
         showAlert("You must login first.")
         return
@@ -476,11 +564,24 @@ document.getElementById('removeSongFromLibrary').onclick = ()=>{ // not implemen
     var output;
     try {
         output = execute_sql(`
-        INSERT INTO library(l_userkey,l_librarykey,l_name, l_playlistkey, l_song_id)
-VALUES (@userkey,(select max(l_librarykey) from library)+1,@libName,NULL,NULL); `, {
-        '@libName' : document.getElementById("libraryName_input").value,
-        '@userkey' : userkey
-    });
+        select * FROM playlist
+        WHERE p_playlistkey = `+document.getElementById('playlistID').value+`;`)
+        if (output == undefined) {
+            showAlert("Playlist does not exist.")
+            return
+        }
+        
+        
+
+        output = execute_sql(`
+        DELETE FROM playlist
+        WHERE p_playlistkey = `+document.getElementById('playlistID').value+`;
+
+        DELETE FROM library
+        WHERE l_libraryKey = `+document.getElementById('playlsitLibraryID').value+`
+        AND l_playlistkey = `+document.getElementById('playlistID').value+`
+        AND l_userkey = `+userKey+`;`)
+        
 
     } catch (error) {
         console.log(error);
@@ -488,7 +589,67 @@ VALUES (@userkey,(select max(l_librarykey) from library)+1,@libName,NULL,NULL); 
     if (output != undefined) {
         create_table(output)
     } else {
-        showAlert("Library Created!")
+        showAlert("Playlist Removed!")
+    }
+
+
+
+};
+
+
+document.getElementById('newSongToPlaylist').onclick = ()=>{ //NOT IMPLEMENTED
+    if (userkey == undefined) {
+        showAlert("You must login first.")
+        return
+    }
+    
+    var output;
+    try {
+        
+        document.getElementById('addSongLibraryID').value
+        document.getElementById('addSongPlaylistID').value
+        document.getElementById('addSongToPlaylist_SongID').value
+
+        output = execute_sql(`
+        `)
+    
+    } catch (error) {
+        console.log(error);
+    }
+    if (output != undefined) {
+        create_table(output)
+    } else {
+        showAlert("Song Added to playlist!")
+    }
+
+
+
+};
+
+
+document.getElementById('removeSongFromPlaylist').onclick = ()=>{ //NOT IMPLEMENTED
+    if (userkey == undefined) {
+        showAlert("You must login first.")
+        return
+    }
+    
+    var output;
+    try {
+        document.getElementById('addSongLibraryID').value
+        document.getElementById('addSongPlaylistID').value
+        document.getElementById('addSongToPlaylist_SongID').value
+
+        output = execute_sql(`
+        `)
+        
+
+    } catch (error) {
+        console.log(error);
+    }
+    if (output != undefined) {
+        create_table(output)
+    } else {
+        showAlert("Song Removed from playlist!")
     }
 
 
