@@ -70,7 +70,6 @@ document.getElementById('loginButton').onclick = ()=>{
      });
     userkey = output.values[0][0]
     username = output.values[0][1]
-    console.log(userkey)
     showAlert("Logged in as " + username)
     } catch (error) {
         showAlert("Incorrect email or password!")
@@ -606,12 +605,17 @@ document.getElementById('newSongToPlaylist').onclick = ()=>{ //NOT IMPLEMENTED
     var output;
     try {
         
-        document.getElementById('addSongLibraryID').value
-        document.getElementById('addSongPlaylistID').value
-        document.getElementById('addSongToPlaylist_SongID').value
-
+        let playlistID = document.getElementById('addSongPlaylistID').value
+        let songID = document.getElementById('addSongToPlaylist_SongID').value
+        output = execute_sql(`select * from playlist where p_playlistkey = `+playlistID+` and p_songID == @SongID;`, {"@SongID": songID})
+        if (output != undefined) {
+            showAlert("Song is already in playlist!")
+            return
+        }
         output = execute_sql(`
-        `)
+        INSERT INTO playlist(p_playlistkey,p_name, p_songID)
+        VALUES (@PlayListID,(select p_name from playlist where p_playlistkey = @PlayListID limit 1), CAST( @SongID AS varchar));
+        `, {"@SongID": songID, "@PlayListID" : playlistID})
     
     } catch (error) {
         console.log(error);
@@ -635,21 +639,44 @@ document.getElementById('removeSongFromPlaylist').onclick = ()=>{ //NOT IMPLEMEN
     
     var output;
     try {
-        document.getElementById('addSongLibraryID').value
-        document.getElementById('addSongPlaylistID').value
-        document.getElementById('addSongToPlaylist_SongID').value
-
+        
+        let playlistID = document.getElementById('addSongPlaylistID').value
+        let songID = document.getElementById('addSongToPlaylist_SongID').value
+        output = execute_sql(`select * from playlist where p_playlistkey = `+playlistID+` and p_songID = @SongID;`, {"@SongID": songID})
+        if (output == undefined) {
+            showAlert("Song is not in the playlist.")
+            return
+        }
         output = execute_sql(`
-        `)
+        delete From playlist
+where p_songID in (select p_songID
+from library, playlist,user
+where 
+l_playlistkey = p_playlistkey
+AND u_userkey = l_userkey
+and p_songID = @SongID
+and l_playlistkey = `+playlistID+`
+and l_userkey = `+userkey+`);
+
+select count(p_playlistkey) from playlist where p_playlistkey = `+playlistID+`;
+
+        `, {"@SongID": songID})
+        
+        if (output) {
+            if (output.values[0] == 0) {
+                execute_sql(`delete From library where l_playlistkey = `+playlistID+`;`)
+            }
+        }
+        
         
 
     } catch (error) {
         console.log(error);
     }
     if (output != undefined) {
-        create_table(output)
-    } else {
         showAlert("Song Removed from playlist!")
+    } else {
+        showAlert("Something went wrong...")
     }
 
 
