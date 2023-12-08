@@ -525,19 +525,22 @@ document.getElementById('createPlaylist').onclick = ()=>{
         showAlert("You must login first.")
         return
     }
-    
+    if (document.getElementById("playlsitLibraryID").value == "") {
+        showAlert("You need to specify in what library you want your playlist to be in.")
+        return
+    }
     var output;
     try {
         
-        let playlistCount = execute_sql(`select max(l_playlistkey) from library`).values[0]+1
+        let playlistCount = execute_sql(`select max(l_playlistkey) from library`).values[0]+1;
         output = execute_sql(`
 
         INSERT INTO library(l_userkey,l_librarykey,l_name, l_playlistkey, l_song_id)
         VALUES (`+userkey+`,`+document.getElementById("playlsitLibraryID").value+`,(select l_name from library where l_librarykey = `+document.getElementById("playlsitLibraryID").value+` limit 1),`+playlistCount+`,NULL); 
 
-        INSERT INTO playlist(p_playlistkey,p_name, p_songID)
-        VALUES (`+playlistCount+`,`+document.getElementById("playlistName").value+`,NULL),
-        `)
+        INSERT INTO playlist(p_playlistkey, p_name, p_songID)
+        VALUES (`+playlistCount+`, @PlaylistName,'NULL: EMPTY PLAYLIST');
+        `, {"@PlaylistName": document.getElementById("playlistName").value, "@LibID": document.getElementById("playlsitLibraryID").value})
         
 
     } catch (error) {
@@ -546,7 +549,7 @@ document.getElementById('createPlaylist').onclick = ()=>{
     if (output != undefined) {
         create_table(output)
     } else {
-        showAlert("Song Added!")
+        showAlert("Playlist Added!")
     }
 
 
@@ -577,9 +580,8 @@ document.getElementById('deletePlaylist').onclick = ()=>{
         WHERE p_playlistkey = `+document.getElementById('playlistID').value+`;
 
         DELETE FROM library
-        WHERE l_libraryKey = `+document.getElementById('playlsitLibraryID').value+`
-        AND l_playlistkey = `+document.getElementById('playlistID').value+`
-        AND l_userkey = `+userKey+`;`)
+        where l_playlistkey = `+document.getElementById('playlistID').value+`
+        AND l_userkey = `+userkey+`;`)
         
 
     } catch (error) {
@@ -601,12 +603,11 @@ document.getElementById('newSongToPlaylist').onclick = ()=>{ //NOT IMPLEMENTED
         showAlert("You must login first.")
         return
     }
-    
+    let playlistID = document.getElementById('addSongPlaylistID').value
+    let songID = document.getElementById('addSongToPlaylist_SongID').value
     var output;
     try {
         
-        let playlistID = document.getElementById('addSongPlaylistID').value
-        let songID = document.getElementById('addSongToPlaylist_SongID').value
         output = execute_sql(`select * from playlist where p_playlistkey = `+playlistID+` and p_songID == @SongID;`, {"@SongID": songID})
         if (output != undefined) {
             showAlert("Song is already in playlist!")
@@ -616,7 +617,8 @@ document.getElementById('newSongToPlaylist').onclick = ()=>{ //NOT IMPLEMENTED
         INSERT INTO playlist(p_playlistkey,p_name, p_songID)
         VALUES (@PlayListID,(select p_name from playlist where p_playlistkey = @PlayListID limit 1), CAST( @SongID AS varchar));
         `, {"@SongID": songID, "@PlayListID" : playlistID})
-    
+        
+
     } catch (error) {
         console.log(error);
     }
@@ -624,6 +626,8 @@ document.getElementById('newSongToPlaylist').onclick = ()=>{ //NOT IMPLEMENTED
         create_table(output)
     } else {
         showAlert("Song Added to playlist!")
+        execute_sql(`
+        delete from playlist where p_songID = 'NULL: EMPTY PLAYLIST' and p_playlistkey = ` + playlistID + `;`)
     }
 
 
@@ -634,6 +638,10 @@ document.getElementById('newSongToPlaylist').onclick = ()=>{ //NOT IMPLEMENTED
 document.getElementById('removeSongFromPlaylist').onclick = ()=>{ //NOT IMPLEMENTED
     if (userkey == undefined) {
         showAlert("You must login first.")
+        return
+    }
+    if (document.getElementById('addSongToPlaylist_SongID').value == 'NULL: EMPTY PLAYLIST') {
+        showAlert("Invalid songID.")
         return
     }
     
